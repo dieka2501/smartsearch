@@ -17,8 +17,9 @@ class destination extends Model
     }
 
     function get_tag($arr,$cari){
-    	asort($arr);
-    	$count = count($arr);
+    	arsort($arr);
+    	// var_dump($arr);
+    	// $count = count($arr);
     	$sql   = "";
     	$where = "";
     	foreach ($arr as $key => $value) {

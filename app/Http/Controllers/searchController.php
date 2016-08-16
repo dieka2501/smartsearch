@@ -20,19 +20,26 @@ class searchController extends Controller
     function index(Request $request){
 
     	if($request->has("q")){
-    		$gettag 	= $this->tag->get_count();
-    		// var_dump($gettag);
-    		foreach ($gettag as $tags) {
-    			$arr[] = [$tags->key => $tags->jumlah];
+    		if($request->session()->has('interest')){
+    			$arr = session('interest');
+    			// var_dump($arr);die;
+    		}else{
+    			$gettag 	= $this->tag->get_count();
+	    		// var_dump($gettag);
+	    		foreach ($gettag as $tags) {
+	    			$arr[] = [$tags->key => $tags->jumlah];
+	    		}	
     		}
-
+    		
     		$cari 		= $request->input('q');
 	    	// $getdata 	= $this->des->get_search($cari);	
+
 	    	$getdata 	= $this->des->get_tag($arr,$cari);
     	}else{
     		$getdata 	= [];
     		$cari 		= "";
     	}
+    	// var_dump(session('interest'));
     	$view['data'] 	= $getdata;
     	$view['cari'] 	= $cari;
     	return view('front.index',$view);
@@ -45,19 +52,25 @@ class searchController extends Controller
     	$insert['tag_value'] 				= 1;
     	$insert['created_at'] 				= date('Y-m-d H:i:s');
     	// var_dump($request->session()->has($getid->destination_tag));
-    	// if(!$request->session()->has('interest')){
-    	// 	$request->session()->put($getid->destination_tag, 1);	
-    	// }else{
-    	// 	$sesbefore = session($getid->destination_tag);
+    	if(!$request->session()->has('interest.'.$getid->destination_tag)){
+    		$request->session()->put('interest.'.$getid->destination_tag, 1);	
+    	}else{
+    		$sesbefore = session('interest.'.$getid->destination_tag);
+    		$sesnext   = $sesbefore +1;	
+    		$request->session()->put('interest.'.$getid->destination_tag,$sesnext);	
+    		// if(isset($sesbefore[$getid->destination_tag])){
+    			
+    		// }else{
+    		// 	$request->session()->put('interest',[$getid->destination_tag => 1]);		
+    		// }
+    		
+    		// echo $sesnext;
+    		
 
-    	// 	$sesnext   = $sesbefore +1;
-    	// 	// echo $sesnext;
-    	// 	$request->session()->put('interest', [$getid->destination_tag=>1]);	
-
-    	// }
-    	// var_dump($sesbefore);
+    	}
+    	// var_dump(session('interest'));
     	$this->tag->add($insert);
-    	var_dump($request->session()->all());
+    	// var_dump($request->session()->all());
     	return view('front.detail',$view);
     }
 }
